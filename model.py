@@ -34,7 +34,7 @@ for stage in range(NUM_STAGES):
 
     # Calculate initial and extended acceleration
     initial_acceleration = (initial_velocity ** 2 + 2 * acceleration * PROJECTILE_LENGTH) ** 0.5
-    extended_length = max(0, modified_coil_lengths[stage] - PROJECTILE_LENGTH)
+    extended_length = (modified_coil_lengths[stage] - PROJECTILE_LENGTH) * (modified_coil_lengths[stage] > PROJECTILE_LENGTH)
     extended_acceleration = (initial_acceleration ** 2 + 2 * acceleration * extended_length) ** 0.5
     initial_velocity = extended_acceleration
 
