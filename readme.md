@@ -1,5 +1,5 @@
 # Battery-Powered Electromagnetic Gun (aka Coil Gun)
-![Fusion Model 10 stages](images\10-stage-side-profile-fusion-360.png) 
+![Fusion Model 10 stages](images/10-stage-side-profile-fusion-360.png) 
 
 ## Background
 
