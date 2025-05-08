@@ -27,7 +27,7 @@ The 10-stage coil gun I built reached a maximum velocity of about 12–14 m/s. O
 - Voltage: 20V
 - Max Discharge Current: 40A
 
-For anyone considering building one: the velocity gain per stage decreases as you add more stages. After about 15–20 stages, the improvements become marginal — extra stages may not be worth the added complexity or cost (see Figure 3). I also lost the original PCB files, so you'll need to design your own (Sorry).
+For anyone considering building one: the velocity gain per stage decreases as you add more stages. After about 15–20 stages, the improvements become less — extra stages may not be worth the cost (see Figure 3). I also lost the original PCB files, so you'll need to design your own (Sorry).
 
 ![Velocity vs Stage](images/20-stages-graph.png)  
 <b>Fig 3:</b> Velocity vs Stage graph for 20-stage coil gun with 40A supply
