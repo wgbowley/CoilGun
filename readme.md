@@ -3,7 +3,7 @@
 
 ## Background
 
-The setup consists of a solenoid coil, a photogate, and switching circuitry. When the photogate detects a projectile, it triggers current to flow through the coil, generating a magnetic field. The projectile, being ferromagnetic, seeks an arrangement that minimizes potential energy. This change creates a force that accelerates the projectile toward the center of the coil. Once the projectile reaches the center, the current is switched off, collapsing the magnetic field and allowing the projectile to continue its motion toward the next stage. If the magnetic field doesn't collapse, the projectile will oscillate until it settles in the center.
+The setup consists of a solenoid coil, a photogate, and switching circuitry. When the photogate detects a projectile, it triggers current to flow through the coil, generating a magnetic field. The projectile, being ferromagnetic, moves toward the region of lowest magnetic potential energy—typically the center of the coil. This change in potential creates a force that accelerates the projectile toward the coil's center. To maximize acceleration and prevent deceleration, the current is switched off just before the projectile reaches the center, collapsing the magnetic field and allowing the projectile to continue its motion toward the next stage. If the magnetic field remains active, it will pull the projectile back, causing it to oscillate until it settles in the center.
 
 ![FEMM Post-processor Output](images/Finite-element-magnetic-methods-output.png)  
 <b>Fig 1:</b> FEMM post-processor output of the coil & projectile
