@@ -16,6 +16,9 @@ The setup consists of a solenoid coil, a photogate, and switching circuitry. Whe
 
 The 10-stage coil gun I built reached a maximum velocity of about 12–14 m/s. One of the main limitations comes from the 2N2222A transistor used in the switching circuit — it has a maximum collector-emitter voltage of 40VDC. This caps the voltage that can be safely applied to the system, which in turn limits the current the coil can draw. It also means that a capacitor bank can't be used to power the coil. That said, this wasn’t an issue since the design wasn't intended to use capacitors.
 
+<b>Note</b>: A more in-depth article will be published on my upcoming website once development of my open-source linear motor, Project BlueShark, is complete.  
+<span style="font-size: 50%;">(This will include data & the construction process)</span>
+      
 **Coil Specs:**
 - Number of turns: 175
 - Yoke: 1.5 mm iron wire (2 layers)
