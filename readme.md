@@ -3,7 +3,7 @@
 
 ## Background
 
-The setup consists of a solenoid coil, a photogate, and switching circuitry. When the photogate detects a projectile, it triggers current to flow through the coil, generating a magnetic field. The projectile, being ferromagnetic, moves toward the region of lowest magnetic potential energy—typically the center of the coil. This change in potential creates a force that accelerates the projectile toward the coil's center. To maximize acceleration and prevent deceleration, the current is switched off just before the projectile reaches the center, collapsing the magnetic field and allowing the projectile to continue its motion toward the next stage. If the magnetic field remains active, it will pull the projectile back, causing it to oscillate until it settles in the center.
+A coilgun is made up of several modules that speed up the projectile. Each module has three parts: a sensor, a switch, and a coil. When the sensor detects the projectile, it tells the switch to turn on the coil. The coil creates a magnetic field that pulls the ferromagnetic projectile toward the center of the coil. To get the fastest speed, the coil is turned off just before the projectile reaches the center. If the coil stayed on, the projectile would slow down and move back and forth before stopping.
 
 ![FEMM Post-processor Output](images/Finite-element-magnetic-methods-output.png)  
 <b>Fig 1:</b> FEMM post-processor output of the coil & projectile
