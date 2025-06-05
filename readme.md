@@ -16,10 +16,14 @@ A coilgun is made up of several modules that speed up the projectile. Each modul
 
 The 10-stage coil gun I built reached a maximum velocity of about 12–14 m/s. One of the main limitations comes from the 2N2222A transistor used in the switching circuit — it has a maximum collector-emitter voltage of 40VDC. This caps the voltage that can be safely applied to the system, which in turn limits the current the coil can draw. It also means that a capacitor bank can't be used to power the coil. That said, this wasn’t an issue since the design wasn't intended to use capacitors.
 
+[![Watch the demo](https://img.youtube.com/vi/GZpUrEFjWWc/0.jpg)](https://youtu.be/GZpUrEFjWWc)
+<br>(3 Stage Verison @ ~30 Volts)
+
 <b>Note</b>: A more in-depth article will be published on my upcoming website once development of my open-source linear motor, Project BlueShark, is complete.  
-<span style="font-size: 50%;">(This will include data & the construction process)</span>
-      
+
 **Coil Specs:**
+- Inductance: ~0.750 mH 
+- Resistance: 0.45 Ohms
 - Number of turns: 175
 - Yoke: 1.5 mm iron wire (2 layers)
 - Wire: 1.25 mm enamel copper wire (5 layers)
