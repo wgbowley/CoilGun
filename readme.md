@@ -1,46 +1,64 @@
-# Battery-Powered Electromagnetic Gun (aka Coil Gun)
-![Fusion Model 10 stages](images/10-stage-side-profile-fusion-360.png) 
+# Modular Battery-Powered Electromagnetic Gun  
+![Fusion Model 10 Stages](images/10-stage-side-profile-fusion-360.png)
 
-## Background
+## Overview  
+This project focuses on **modularity**. Each stage is designed to function independently, allowing me to perfect one module and then stack multiple stages to increase velocity. The launcher accelerates a ferromagnetic projectile using a series of these modular stages.
 
-A coilgun is made up of several modules that speed up the projectile. Each module has three parts: a sensor, a switch, and a coil. When the sensor detects the projectile, it tells the switch to turn on the coil. The coil creates a magnetic field that pulls the ferromagnetic projectile toward the center of the coil. To get the fastest speed, the coil is turned off just before the projectile reaches the center. If the coil stayed on, the projectile would slow down and move back and forth before stopping.
+## How It Works  
+Each module consists of three main components:
 
-![FEMM Post-processor Output](images/Finite-element-magnetic-methods-output.png)  
-<b>Fig 1:</b> FEMM post-processor output of the coil & projectile
+- **Sensor:** Detects the approaching projectile  
+- **Switch:** Powers the coil when triggered by the sensor  
+- **Coil:** Generates a magnetic field that pulls the projectile forward
 
-## Results
+The coil is turned off just before the projectile reaches its center to maximize acceleration. If the coil stays on too long, the projectile would be pulled back and forth, ultimately stopping in the center.
 
+## Performance  
+- Reached a maximum velocity of approximately **12–14 m/s**  
+- Limited by the **2N2222A transistor**, which has a maximum collector-emitter voltage of 40 V  
+- Powered by an **18V Lithium-Ion battery pack**, with a max discharge current of ~40 A  
+
+## Coil Specifications  
+
+| Component        | Details                                                                 |
+|------------------|-------------------------------------------------------------------------|
+| Coil Inductance  | ~0.750 mH                                                               |
+| Coil Resistance  | 0.45 Ω                                                                  |
+| Number of Turns  | 175                                                                     |
+| Yoke             | 1.5 mm iron wire (2 layers)                                             |
+| Wire             | 1.25 mm enamel copper wire (5 layers)                                   |
+| Barrel           | Carbon fiber tube (non-conductive, non-magnetic to reduce eddy currents) |
+
+## Notes  
+- Velocity gain per stage **decreases over time**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed.
+
+  <img src="images/20-stages-graph.png" alt="Velocity vs Stage" height="400"/>
+
+  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage.*
+
+- Original PCB files were lost — a **new PCB design** is required to rebuild the system  
+
+## Possible Improvements  
+- Design built-in **wire channels** between stages  
+- Use a **separate power supply** for NMOS driver circuitry to support higher coil voltages  
+- Apply **optimization algorithms** (random search, evolutionary techniques) to improve coil geometry  
+- Add a **capacitor bank** for higher velocity (at the cost of overall efficiency)  
+
+## Demo  
+[![Watch the demo](https://img.youtube.com/vi/GZpUrEFjWWc/0.jpg)](https://youtu.be/GZpUrEFjWWc)  
+*3-stage version @ ~30 V DC*
+
+## Visuals  
+**FEMM post-processor output of the coil & projectile**  
+![FEMM Output](images/Finite-element-magnetic-methods-output.png)
+
+**Coil & driver board**  
+<img src="images/Coil&DriverBoard.jpg" alt="Coil & Driver Board" width="400" />
+
+**Finished 10-stage version**  
 <img src="images/10-stages-finished.png" alt="Final Product" width="400"/>
-  
-<b>Fig 2:</b> One of the only photos I have of the final build (my phone broke)
 
-The 10-stage coil gun I built reached a maximum velocity of about 12–14 m/s. One of the main limitations comes from the 2N2222A transistor used in the switching circuit — it has a maximum collector-emitter voltage of 40VDC. This caps the voltage that can be safely applied to the system, which in turn limits the current the coil can draw. It also means that a capacitor bank can't be used to power the coil. That said, this wasn’t an issue since the design wasn't intended to use capacitors.
-
-[![Watch the demo](https://img.youtube.com/vi/GZpUrEFjWWc/0.jpg)](https://youtu.be/GZpUrEFjWWc)
-<br>(3 Stage Verison @ ~30 Volts)
-
-<b>Note</b>: A more in-depth article will be published on my upcoming website once development of my open-source linear motor, Project BlueShark, is complete.  
-
-**Coil Specs:**
-- Inductance: ~0.750 mH 
-- Resistance: 0.45 Ohms
-- Number of turns: 175
-- Yoke: 1.5 mm iron wire (2 layers)
-- Wire: 1.25 mm enamel copper wire (5 layers)
-- "Barrel": Carbon fiber tube  
-  _(Avoid conductive or magnetic material to prevent eddy currents)_
-
-**Battery:**
-- Voltage: 20V
-- Max Discharge Current: 40A
-
-For anyone considering building one: the velocity gain per stage decreases as you add more stages. After about 15–20 stages, the improvements become less — extra stages may not be worth the cost (see Figure 3). I also lost the original PCB files, so you'll need to design your own (Sorry).
-
-![Velocity vs Stage](images/20-stages-graph.png)  
-<b>Fig 3:</b> Velocity vs Stage graph for 20-stage coil gun with 40A supply
-
-## Possible Improvements
-
-- Use a separate power supply for the NMOS driver circuitry to allow higher coil voltages without exceeding component limits.
-- Apply random search or evolutionary algorithms to design more efficient coil geometries.
-- Use a capacitor bank to achieve higher velocity (though with lower overall efficiency).
+## Future Work  
+- A full write-up will be published soon on my website  
+- A **coil geometry optimizer** will be created using my existing BLDC motor optimization framework  
+- Work on **Version 2** is planned for 2028 — five years after the original build
