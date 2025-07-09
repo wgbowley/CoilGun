@@ -25,9 +25,14 @@ The coil is turned off just before the projectile reaches its center to maximize
 | Coil Inductance  | ~0.750 mH                                                               |
 | Coil Resistance  | 0.45 Ω                                                                  |
 | Number of Turns  | 175                                                                     |
+| Inner Diameter   | 12.5 mm                                                                 |
+| Outer Diameter   | 35 mm                                                                   |
+| Coil Length      | 50 mm                                                                   |
+| Barrel Diameter  | 10 mm (carbon fiber tube)                                               |
 | Yoke             | 1.5 mm iron wire (2 layers)                                             |
 | Wire             | 1.25 mm enamel copper wire (5 layers)                                   |
 | Barrel           | Carbon fiber tube (non-conductive, non-magnetic to reduce eddy currents) |
+
 
 ## Notes  
 - Velocity gain per stage **decreases over time**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed.
