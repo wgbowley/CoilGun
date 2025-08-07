@@ -1,0 +1,2 @@
+[MESSAGES CONTROL]
+disable = C0103  # Allow non-UPPER_CASE naming (e.g., variable and parameter names)

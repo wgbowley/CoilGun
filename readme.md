@@ -35,11 +35,12 @@ The coil is turned off just before the projectile reaches its center to maximize
 
 
 ## Notes  
-- Velocity gain per stage **decreases over time**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed.
+- **Velocity gain per stage decreases over stages**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed. Additionally, as the object moves faster, it spends less time in each stage, reducing the time available to apply force - further limiting velocity gain.
+
 
   <img src="images/20-stages-graph.png" alt="Velocity vs Stage" height="400"/>
 
-  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage.*
+  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage. [`/simplified_sim`](./simplified_sim/)*
 
 - Original PCB files were lost — a **new PCB design** is required to rebuild the system  
 
