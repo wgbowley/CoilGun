@@ -1,5 +1,5 @@
 # Modular Battery-Powered Electromagnetic Gun  
-![Fusion Model 10 Stages](images/10-stage-side-profile-fusion-360.png)
+![Fusion Model 10 Stages](media/images/10-stage-side-profile-fusion-360.png)
 
 ## Overview  
 This project focuses on **modularity**. Each stage is designed to function independently, allowing me to perfect one module and then stack multiple stages to increase velocity. The launcher accelerates a ferromagnetic projectile using a series of these modular stages.
@@ -13,6 +13,7 @@ Each module consists of three main components:
 
 The coil is turned off just before the projectile reaches its center to maximize acceleration. If the coil stays on too long, the projectile would be pulled back and forth, ultimately stopping in the center.
 
+Go to [`/simulator`](./simulator/) for a detailed physics model and performance analysis.
 ## Performance  
 - Reached a maximum velocity of approximately **12–14 m/s**  
 - Limited by the **2N2222A transistor**, which has a maximum collector-emitter voltage of 40 V  
@@ -35,12 +36,12 @@ The coil is turned off just before the projectile reaches its center to maximize
 
 
 ## Notes  
-- **Velocity gain per stage decreases over stages**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed. Additionally, as the object moves faster, it spends less time in each stage, reducing the time available to apply force - further limiting velocity gain.
+- **Velocity gain per stage decreases over stages**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed. Additionally, as the object moves faster, it spends less time in each stage, reducing the time, which reduces current and force - further limiting velocity gain.
 
 
-  <img src="images/20-stages-graph.png" alt="Velocity vs Stage" height="400"/>
+  <img src="media/images/20-stages-graph.png" alt="Velocity vs Stage" height="400"/>
 
-  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage. [`/simplified_sim`](./simplified_sim/)*
+  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage. [`/simulator`](./simulator/)*
 
 - Original PCB files were lost — a **new PCB design** is required to rebuild the system  
 
@@ -56,13 +57,13 @@ The coil is turned off just before the projectile reaches its center to maximize
 
 ## Visuals  
 **FEMM post-processor output of the coil & projectile**  
-![FEMM Output](images/Finite-element-magnetic-methods-output.png)
+![FEMM Output](media/images/Finite-element-magnetic-methods-output.png)
 
 **Coil & driver board**  
-<img src="images/Coil&DriverBoard.jpg" alt="Coil & Driver Board" width="400" />
+<img src="media/images/Coil&DriverBoard.jpg" alt="Coil & Driver Board" width="400" />
 
 **Finished 10-stage version**  
-<img src="images/10-stages-finished.png" alt="Final Product" width="400"/>
+<img src="media/images/10-stages-finished.png" alt="Final Product" width="400"/>
 
 ## Future Work  
 - A full write-up will be published soon on my website  

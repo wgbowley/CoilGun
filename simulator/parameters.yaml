@@ -1,0 +1,17 @@
+model:
+  flyback: TRUE                # Enables flyback diode simulation: prevents reverse current flow during coil discharge
+  number_stages: 20             # Total number of acceleration stages in the coilgun
+  voltage: 18                  # Supply voltage (Volts) applied to each coil stage
+
+projectile:
+  radius: 0.0045               # Projectile outer radius in meters (4.5 mm)
+  mass: 0.020                  # Projectile mass in kilograms (20 grams)
+  relative_perm: 100           # Relative magnetic permeability (dimensionless) of projectile material
+
+coil:
+  axial_length: 0.050          # Coil length along the barrel axis (meters)
+  outer_radius: 0.0175         # Outer radius of the coil (meters)
+  inner_radius: 0.00625        # Inner radius of the coil (meters)
+  resistance: 0.45             # Electrical resistance of the coil (Ohms)
+  inductance: 0.00075          # Coil inductance (Henrys)
+  turns: 175                   # Number of turns of wire in the coil winding
