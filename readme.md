@@ -44,7 +44,7 @@ the Ampere-Maxwell Law.
 
 <img src="media/images/10-stages-graph.png" alt="Velocity vs Stage" height="400"/>
 
-As you can see from the graph above, coil-guns gain most of their velocity on the first few stages with smaller
+As you can see from the graph above, coil-guns gain most of its velocity on the first few stages with smaller
 and smaller returns for each new stage. This is caused by the amount of energy to accelerate increasing with velocity.
 It is also caused by ```LR``` setting time, often as a coil gets bigger it takes more time for current to ramp up. So
 your effective current is ```1/10th``` or ```1/5th``` of the first stage. 
@@ -54,8 +54,8 @@ Perhaps you could built a better design than me.
 # Build: First time the charm?
 
 So each stage had a coil with approximately ```175 turns```, ```~0.750 mH``` and ```0.25 Ω```. 
-This coil was driven by a N-MOSFET though a transistor network and a 555 timer IC. 
-The 555 timer was triggered by a UV photo-diode or a bypass button. Pulse length was configurable using a ```0-10 kΩ``` potentiometer. 
+This coil was driven by a N-channel MOSFET though a transistor network and a 555 timer IC. 
+The 555 timer was triggered by a UV photo-transistor or a bypass button. Pulse length was configurable using a ```0-10 kΩ``` potentiometer. 
 The design worked quite well as stated above however due to over-heating the triggering transistors for the N-MOS were cooked for all but 3 stages after ```~100``` tests. 
 
 | Component        | Details                                                                 |
@@ -83,8 +83,10 @@ should improve the ```F/I``` but it also increases the ```LR``` time constant, s
 
 ## Future work
 To continue from here a coupled multi-physics model will be made to more accurately model the coilgun. 
-Most likely quasi-transient magneto, thermo and electro loop using FEM. That loop should allow for trend off analysis like yoke size, etc. 
-The plan is to continue work in late 2027 - early 2028 due to it being five years since the original build.
+Most likely quasi-transient magneto, thermo and electro loop using FEM. That loop should allow for trend analysis like yoke size, etc. 
+The plan is to continue work in late 2027 - early 2028 due to it being five years since the original build. 
+This build is a performance measure for myself with quinquennial evaluation. 
+Thank you for reading, if you enjoyed. Feel free to check out my other projects.
 
 
 ### Bibtex Citation:
