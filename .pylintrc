@@ -1,2 +1,3 @@
 [MESSAGES CONTROL]
 disable = C0103  # Allow non-UPPER_CASE naming (e.g., variable and parameter names)
+disable = C0411  # First party imports before third party

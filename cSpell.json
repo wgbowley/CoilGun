@@ -1,0 +1,20 @@
+{
+  "ignorePaths": [
+    "**/*.{asc,lib,asy,trk,pdf,iges}"
+  ],
+  "version": "0.2",
+  "language": "en-US",
+  "words": [
+    "Coilgun",
+    "picounits",
+    "bowley",
+    "ylabel",
+    "xlabel",
+    "sharex",
+    "figsize",
+    "matplot",
+    "iges",
+    "ralston",
+    "mosfet"
+  ]
+}

@@ -1,0 +1,31 @@
+[version]
+format: 0.1.0
+unit_frame: units.ut
+
+[notes]
+# Analytical model for a multi-stage coil-gun via rk_2nd methods for currents
+# and explicit euler for motional dynamics.
+
+[model]
+number_stages: 10
+stage_gap: 10 m(m)
+voltage: 18 (V)
+current_limit: 40 (A) 
+time_steps: 50 u(s)
+atmospheric_density: 1.225 (kg/m^3)
+
+[projectile]
+radius: 4.5 m(m)
+axial_length: 45 m(m)
+density: 7850 (kg/m^3)
+coefficient_drag: 0.82
+relative_permeability: 100
+magnetic_saturation: 1.8 (T)
+
+[coil]
+axial_length: 50 m(m)
+outer_radius: 17.5 m(m)
+inner_radius: 6.25 m(m)
+wire_diameter: 1.25 m(m)
+fill_factor: 0.7
+resistivity: 16.8 n(Ω*m)

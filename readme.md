@@ -1,30 +1,67 @@
-# Modular Battery-Powered Electromagnetic Gun  
-![Fusion Model 10 Stages](media/images/10-stage-side-profile-fusion-360.png)
 
-## Overview  
-This project focuses on **modularity**. Each stage is designed to function independently, allowing me to perfect one module and then stack multiple stages to increase velocity. The launcher accelerates a ferromagnetic projectile using a series of these modular stages.
+![Fusion Model 10 Stages](media/images/banner.png)
 
-## How It Works  
-Each module consists of three main components:
+---
+Whats the most exciting area in physics? Well obviously electromagnetism. 
+So naturally as a 14-year old I wanted to build a device to do with it. 
+After watching a few youtube videos, I discovered the idea of a
+coilgun. 
+A device that used invisible fields to accelerate metal to high speeds.
 
-- **Sensor:** Detects the approaching projectile  
-- **Switch:** Powers the coil when triggered by the sensor  
-- **Coil:** Generates a magnetic field that pulls the projectile forward
+# Overview
+![Work in Progress](https://img.shields.io/badge/status-wip-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-The coil is turned off just before the projectile reaches its center to maximize acceleration. If the coil stays on too long, the projectile would be pulled back and forth, ultimately stopping in the center.
+This project focused on modularity with much prototyping going into the a singular stage. 
+Then the perfected stage was then stacked into a group of 10. 
+The final ```10 stage``` prototype achieved a velocity of ```14 m/s``` and a maximal current of ```40 A```. 
+The total cost of the launcher was ```~$200 AUS``` in 2022.
 
-Go to [`/simulator`](./simulator/) for a detailed physics model and performance analysis.
-## Performance  
-- Reached a maximum velocity of approximately **12–14 m/s**  
-- Limited by the **2N2222A transistor**, which has a maximum collector-emitter voltage of 40 V  
-- Powered by an **18V Lithium-Ion battery pack**, with a max discharge current of ~40 A  
+### How does it work?
 
-## Coil Specifications  
+When you have moving charge within a conductor like a loop of wire, a magnetic field is formed. 
+This field wants to decrease local resistance to flow easier. 
+So materials with a specific structures experience a force trying to align them with the field. 
+If you increase the number of loops and/or the amount of charge. 
+The force grows so powerful that it can move large objects around. 
+To use this property we have to engineer it, so each consists of three main elements:
+
+- **Sensor:**   Detects the approaching projectile  
+- **Switch:**   Powers the coil when triggered by the sensor  
+- **Coil:**     Generates a magnetic field that pulls the projectile forward
+
+The mechanics are quite eloquent though inefficient, the coil is turned on by a projectile passing the sensor which triggers the switch. 
+The charge is than allowed to flow until the projectile reaches the center where the switch is turned off; 
+which collapse the magnetic field resulting in the projectile continuing off into space. However if the coil isn't switch, 
+the projectile will oscillate and ultimately stop were its alignment is best. This is often the center but depends on geometry.
+
+# Pre-design: The simulator
+
+To understand the dynamics of such a complex system, a lumped parameter model was made that solves a few
+different equations as a approximal solution. It uses ralston's method for current flow and euler method for
+motional modelling. The force is modelled using a overlapping boundary method and a analytical formula for 
+the Ampere-Maxwell Law.
+
+<img src="media/images/10-stages-graph.png" alt="Velocity vs Stage" height="400"/>
+
+As you can see from the graph above, coil-guns gain most of their velocity on the first few stages with smaller
+and smaller returns for each new stage. This is caused by the amount of energy to accelerate increasing with velocity.
+It is also caused by ```LR``` setting time, often as a coil gets bigger it takes more time for current to ramp up. So
+your effective current is ```1/10th``` or ```1/5th``` of the first stage. 
+Lastly due to the projectile velocity ```dλ/dt``` starts to sag the effective voltage but nevertheless just go to [`/simulator`](./simulator/) and try it yourself. 
+Perhaps you could built a better design than me.
+
+# Build: First time the charm?
+
+So each stage had a coil with approximately ```175 turns```, ```~0.750 mH``` and ```0.25 Ω```. 
+This coil was driven by a N-MOSFET though a transistor network and a 555 timer IC. 
+The 555 timer was triggered by a UV photo-diode or a bypass button. Pulse length was configurable using a ```0-10 kΩ``` potentiometer. 
+The design worked quite well as stated above however due to over-heating the triggering transistors for the N-MOS were cooked for all but 3 stages after ```~100``` tests. 
 
 | Component        | Details                                                                 |
 |------------------|-------------------------------------------------------------------------|
 | Coil Inductance  | ~0.750 mH                                                               |
-| Coil Resistance  | 0.45 Ω                                                                  |
+| Coil Resistance  | 0.25 Ω                                                                  |
 | Number of Turns  | 175                                                                     |
 | Inner Diameter   | 12.5 mm                                                                 |
 | Outer Diameter   | 35 mm                                                                   |
@@ -34,38 +71,31 @@ Go to [`/simulator`](./simulator/) for a detailed physics model and performance 
 | Wire             | 1.25 mm enamel copper wire (5 layers)                                   |
 | Barrel           | Carbon fiber tube (non-conductive, non-magnetic to reduce eddy currents) |
 
+3-stage demo at ~30V DC that resulted in a exit velocity of ```10.2m/s``` and kinetic energy of ```1.14J```. 
+Interestingly the 3-stage version performance quite well on this demonstration achieving about ```~70%``` of the velocity as the 10-stage version.
 
-## Notes  
-- **Velocity gain per stage decreases over stages**, as shown below. This happens because kinetic energy increases with the square of velocity (E ∝ v²), so each additional stage must deliver more energy to achieve the same increase in speed. Additionally, as the object moves faster, it spends less time in each stage, reducing the time, which reduces current and force - further limiting velocity gain.
+[![Watch the demo](media/images/fusion-model.png)](https://youtu.be/GZpUrEFjWWc)  
 
 
-  <img src="media/images/20-stages-graph.png" alt="Velocity vs Stage" height="400"/>
+To improve the design the triggering transistors should be replaced with either a gate driver or simply a higher rated
+BJT transistor. Another consideration is to if the iron wire yoke actually improves efficiency or not. Because the yoke
+should improve the ```F/I``` but it also increases the ```LR``` time constant, so most likely its a balancing act. Lastly the original pcb files were lost due to my phone being damaged.
 
-  *Velocity vs. stage graph for a 20-stage coilgun powered by a 40 A supply, showing diminishing returns in velocity gain per stage. [`/simulator`](./simulator/)*
+## Future work
+To continue from here a coupled multi-physics model will be made to more accurately model the coilgun. 
+Most likely quasi-transient magneto, thermo and electro loop using FEM. That loop should allow for trend off analysis like yoke size, etc. 
+The plan is to continue work in late 2027 - early 2028 due to it being five years since the original build.
 
-- Original PCB files were lost — a **new PCB design** is required to rebuild the system  
 
-## Possible Improvements  
-- Design built-in **wire channels** between stages  
-- Use a **separate power supply** for NMOS driver circuitry to support higher coil voltages  
-- Apply **optimization algorithms** (random search, evolutionary techniques) to improve coil geometry  
-- Add a **capacitor bank** for higher velocity (at the cost of overall efficiency)  
+### Bibtex Citation:
 
-## Demo  
-[![Watch the demo](https://img.youtube.com/vi/GZpUrEFjWWc/0.jpg)](https://youtu.be/GZpUrEFjWWc)  
-*3-stage version @ ~30 V DC*
-
-## Visuals  
-**FEMM post-processor output of the coil & projectile**  
-![FEMM Output](media/images/Finite-element-magnetic-methods-output.png)
-
-**Coil & driver board**  
-<img src="media/images/Coil&DriverBoard.jpg" alt="Coil & Driver Board" width="400" />
-
-**Finished 10-stage version**  
-<img src="media/images/10-stages-finished.png" alt="Final Product" width="400"/>
-
-## Future Work  
-- A full write-up will be published soon on my website  
-- A **coil geometry optimizer** will be created using my existing BLDC motor optimization framework  
-- Work on **Version 2** is planned for 2028 — five years after the original build
+```
+@misc{Bowley_2023,
+  author = {Bowley, William},
+  title = {{CoilGun}},
+  url = {https://github.com/wgbowley/CoilGun},
+  year = {2023},
+  note = {GitHub repository},
+  license = {MIT}
+}
+```
