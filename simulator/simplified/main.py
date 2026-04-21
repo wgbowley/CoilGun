@@ -13,7 +13,7 @@ Description:
 
 from math import pi
 from pathlib import Path
-from matplot import plot
+from simulator.simplified.matplot import plot
 
 from picounits.extensions.parser import Parser
 from picounits.constants import (
@@ -21,7 +21,7 @@ from picounits.constants import (
     PERMEABILITY, FLUX_DENSITY
 )
 
-from equations import (
+from simulator.simplified.equations import (
     inductor_voltage, rk_2nd_order_current, position_b_field,
     inst_force, clipping_current, projectile_drag, projectile_mass,
     estimate_turns, cal_resistance, cal_inductance,

@@ -1,7 +1,5 @@
 """
 Filename: equations.py
-Author: William Bowley
-Version: 0.1
 
 Description:
     Equations for a analytical coil-gun model
@@ -127,6 +125,7 @@ def rk_2nd_order_current(
     k1 = differential_currents(voltage, inductance)
 
     # Updates the voltage for the next predicted frame
+    print(k1)
     voltage = voltage - resistance * 3 / 4 * step_size * k1
     k2 = differential_currents(voltage, inductance)
 

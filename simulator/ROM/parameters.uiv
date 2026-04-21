@@ -1,0 +1,9 @@
+[version]
+format: 0.1.0
+unit_frame: units.ut
+
+[notes]
+# Analytical model for a multi-stage coil-gun via rk_2nd methods for currents
+# and explicit euler for motional dynamics.
+
+[model]
