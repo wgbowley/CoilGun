@@ -6,6 +6,9 @@ unit_frame: units.ut
 # Analytical model for a multi-stage coil-gun via rk_2nd methods for currents
 # and explicit euler for motional dynamics.
 
+# Assume the coil is made of a material that has a permeability approximately
+# equal to free space.
+
 [model]
 number_stages: 10
 time_steps: 50 u(s)
@@ -14,6 +17,7 @@ stage_gap: 10 m(m)
 voltage: 18 (V)
 battery_esr: 250 m(Ω)
 atmospheric_density: 1.225 (kg/m^3)
+
 
 [projectile]
 radius: 4.5 m(m)
@@ -44,6 +48,7 @@ magnetic_hysteresis: [
   [2.523750, 290439.000000],
   [2.560000, 318310.000000]
 ] (T), (A_m)
+
 
 [coil]
 axial_length: 50 m(m)
