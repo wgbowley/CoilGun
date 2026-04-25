@@ -1,11 +1,8 @@
 """
 Filename: matplot.py
-Author: William Bowley
-Version: 0.1
 
 Description:
-    Graphing script for the analytical lumped
-    parameter coil-gun simulation using picounits
+    Graphing script for the analytical lumped parameter coil-gun simulation
 """
 
 from typing import Sequence

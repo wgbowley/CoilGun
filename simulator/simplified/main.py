@@ -1,7 +1,5 @@
 """
 Filename: main.py
-Author: William Bowley
-Version: 0.1
 
 Description:
     Analytical lumped-parameter coil-gun model for quick optimization.
@@ -13,27 +11,21 @@ Description:
 
 from math import pi
 from pathlib import Path
-from simulator.simplified.matplot import plot
+from plotting import plot
 
 from picounits.extensions.parser import Parser
 from picounits.constants import (
-    TIME, VELOCITY, LENGTH, CURRENT, VOLTAGE, DIMENSIONLESS,
-    PERMEABILITY, FLUX_DENSITY
+    TIME, VELOCITY, LENGTH, CURRENT, VOLTAGE, DIMENSIONLESS, PERMEABILITY, FLUX_DENSITY
 )
 
-from simulator.simplified.equations import (
-    inductor_voltage, rk_2nd_order_current, position_b_field,
-    inst_force, clipping_current, projectile_drag, projectile_mass,
-    estimate_turns, cal_resistance, cal_inductance,
+from equations import (
+    inductor_voltage, rk_2nd_order_current, position_b_field, inst_force, clipping_current, 
+    projectile_drag, projectile_mass, estimate_turns, cal_resistance, cal_inductance,
     calculate_approximate_core_permeability
 )
 
-
-BASE_DIR = Path(__file__).parent.parent.parent 
-p = Parser.open(
-    BASE_DIR / "coilgun/simulator/parameters.uiv",
-    BASE_DIR / "coilgun/simulator/units.ut"
-)
+BASE_DIR = Path(__file__).parent
+p = Parser.open(BASE_DIR / "parameters.uiv", BASE_DIR / "units.ut")
 
 # Set calculations
 permeability = 4 * pi * 1e-7 * PERMEABILITY
@@ -42,16 +34,11 @@ turns = estimate_turns(
     p.coil.axial_length, p.coil.inner_radius, p.coil.outer_radius,
     p.coil.wire_diameter, p.coil.fill_factor
 )
+
 turns_per_meter = turns / p.coil.axial_length
-resistance = cal_resistance(
-    turns, average_radius, p.coil.wire_diameter, p.coil.resistivity
-)
-inductance = cal_inductance(
-    turns, p.coil.axial_length, average_radius, permeability
-)
-mass = projectile_mass(
-    p.projectile.axial_length, p.projectile.radius, p.projectile.density
-)
+resistance = cal_resistance(turns, average_radius, p.coil.wire_diameter, p.coil.resistivity)
+inductance = cal_inductance(turns, p.coil.axial_length, average_radius, permeability)
+mass = projectile_mass(p.projectile.axial_length, p.projectile.radius, p.projectile.density)
 
 # Prints calculated parameters such as projectile mass, inductance, resistance
 print("=== Coil Gun derived parameters ===")
@@ -96,9 +83,7 @@ for stage in range(p.model.number_stages.stripped):
             supply_voltage = p.model.voltage
 
         # Calculates the inductor voltage, then inductor current & limiting
-        voltage = inductor_voltage(
-            supply_voltage, current, resistance, induced_voltage
-        )
+        voltage = inductor_voltage(supply_voltage, current, resistance, induced_voltage)
         current = rk_2nd_order_current(
             current, voltage, motional_inductance, resistance,
             p.model.time_steps
@@ -112,9 +97,7 @@ for stage in range(p.model.number_stages.stripped):
             p.projectile.magnetic_saturation
         )
 
-        force = inst_force(
-            b_now, motional_permeability, p.projectile.radius, direction
-        )
+        force = inst_force(b_now, motional_permeability, p.projectile.radius, direction)
         force += projectile_drag(
             velocity, p.model.atmospheric_density,
             p.projectile.coefficient_drag, p.projectile.radius
@@ -179,6 +162,4 @@ for stage in range(p.model.number_stages.stripped):
 print("==============================")
 
 # Plot combined velocity vs time for all stages
-plot(
-    total_time_data, total_current_data, total_force_data, total_velocity_data
-)
+plot(total_time_data, total_current_data, total_force_data, total_velocity_data)

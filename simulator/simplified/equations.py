@@ -3,7 +3,6 @@ Filename: equations.py
 
 Description:
     Equations for a analytical coil-gun model
-    as an example, for the picounits library
 """
 
 from math import pi, ceil
@@ -125,7 +124,6 @@ def rk_2nd_order_current(
     k1 = differential_currents(voltage, inductance)
 
     # Updates the voltage for the next predicted frame
-    print(k1)
     voltage = voltage - resistance * 3 / 4 * step_size * k1
     k2 = differential_currents(voltage, inductance)
 
