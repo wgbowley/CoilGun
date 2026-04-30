@@ -17,6 +17,19 @@ class ProjectileData:
     position: f
     velocity: f
     
+    @property
+    def name(self) -> str:
+        """ Returns the dataclasses name """
+        return(
+            f"<Proj(mass:{self.mass:.5f}kg" 
+            f", position:{self.position:.5f}m"
+            f", velocity:{self.velocity:.5f}m/s)>"
+        )
+        
+    def __repr__(self) -> str: return self.name
+   
+        
+    
 @dataclass(slots=True)
 class CoilData:
     """ Coil parameters specifically position, voltage & current. Also inductance & resistance"""
@@ -26,3 +39,16 @@ class CoilData:
     turns: f
     inductance: f
     resistance: f
+    
+    @property
+    def name(self) -> str:
+        """ Returns the dataclasses name """
+        return (
+            f"<Coil(pos:{self.position:.5f}m" 
+            f", V:{self.voltage:.5f}v"
+            f", I:{self.current:.5f}A"
+            f", L:{self.inductance:.5f}H"
+            f", R:{self.resistance:.5f}Ω)>"
+        )
+        
+    def __repr__(self) -> str: return self.name

@@ -7,7 +7,7 @@ Description:
 """
 
 from builtins import float as f
-from math import pi, ceil
+from math import pi, ceil, log
 
 from picounits import strip_quantity as q_strip
 from picounits.extensions.loader import DynamicLoader
@@ -29,8 +29,7 @@ class CoilGun:
         
         self.projectile = ProjectileData(
             mass = compute_projectile_mass(self.proj_len, self.proj_rad, self.proj_density),
-            position = -self.proj_len, 
-            velocity = 0.0
+            position = 0.0, velocity = 0.0
         )
         
         # Calculates the turns & permeability
@@ -41,7 +40,7 @@ class CoilGun:
         self.coils: list[CoilData] = []
         for index in range(self.number_stages): 
             coil = CoilData(
-                position = self.proj_len * (index + 1) + self.stage_gap * index,
+                position = self.coil_len * (index + 1) + self.stage_gap * index,
                 voltage = 0.0,
                 current = 0.0,
                 turns = turns,
@@ -51,6 +50,8 @@ class CoilGun:
                 )
             )
             self.coils.append(coil)
+        
+        self._lookup_density(1)
         
     def _compute_proj_force(self, dz: f) -> f:
         """ 
@@ -100,10 +101,34 @@ class CoilGun:
 
         return b_z
     
-    def _lookup_density(field_strength: f) -> f:
+    def _lookup_density(self, field_strength: f) -> f:
         """ lookups the field density for a specific field_strength """
-        return
-  
+        # Enforces field strength boundaries
+        if field_strength <= self.proj_h[0]: 
+            return self.proj_b[0]
+
+        if field_strength >= self.proj_h[-1]: 
+            return self.proj_b[-1]
+        
+        num = 0
+        for i in range(self.proj_bh_length - 1):
+            if field_strength < self.proj_h[i+1]:
+                num = i
+                break
+            
+        # Approximates using linear interpolation if field strength is very simple
+        if field_strength < 1.0:
+            frac = (field_strength - self.proj_h[num]) / (self.proj_h[num+1] - self.proj_h[num])
+            return self.proj_b[num] + frac * (self.proj_b[num+1] - self.proj_b[num])
+        
+        # Log-linear interpolation (for large field strength values)
+        log_field_strength = log(field_strength)
+        log_low, log_high = self.proj_log_h[num], self.proj_log_h[num+1]
+        
+        frac = (log_field_strength - log_low) / (log_high - log_low)
+        return self.proj_b[num] + frac * (self.proj_b[num] - self.proj_b[num])
+
+
     def extract_and_strip(self, parameters: DynamicLoader) -> None:
         """ Extracts than validates and finally strips the parameter from configuration file """
         self.number_stages = q_strip(parameters.model.number_stages, NULLSET)
@@ -117,17 +142,22 @@ class CoilGun:
         self.proj_coe_drag = q_strip(parameters.projectile.coefficient_drag, NULLSET)
         self.proj_density = q_strip(parameters.projectile.density, MASS/LENGTH **3)
         
-        # Strips magnetic hysteresis table (b, h)
+        # Strips magnetic hysteresis table (b, h)co
         hysteresis = parameters.projectile.magnetic_hysteresis
         
         # Constructs the field_strength (h -> b) lookup table
-        proj_hysteresis = []
+        self.proj_h, self.proj_log_h, self.proj_b = [], [], []
         for row in hysteresis:
             field_density = q_strip(row[0], FLUX_DENSITY)
             field_strength = q_strip(row[1], CURRENT / LENGTH)
             
-            proj_hysteresis.append([field_strength, field_density])
-        
+            self.proj_b.append(field_density)
+            
+            self.proj_h.append(field_strength)
+            self.proj_log_h.append(log(field_strength))
+
+        self.proj_bh_length = len(self.proj_h)
+
         self.coil_len = q_strip(parameters.coil.axial_length, LENGTH)
         self.coil_outer_rad = q_strip(parameters.coil.outer_radius, LENGTH)
         self.coil_inner_rad = q_strip(parameters.coil.inner_radius, LENGTH)
