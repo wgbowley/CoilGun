@@ -3,4 +3,4 @@ disable = C0103         # Allow non-UPPER_CASE naming (e.g., variable and parame
 disable = C0411         # First party imports before third party
 
 [FORMAT]
-max-line-length=100      # Maximum number of characters on a single line.
+max-line-length=120     # Maximum number of characters on a single line.

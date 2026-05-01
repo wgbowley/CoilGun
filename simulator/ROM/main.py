@@ -16,3 +16,4 @@ BASE_DIR = Path(__file__).parent
 parameter = Parser.open(BASE_DIR / "parameters.uiv", BASE_DIR / "units.ut")
 
 coilgun = CoilGun(parameter)
+coilgun.simulate()

@@ -40,7 +40,7 @@ def computes_inductor_voltage(
 def compute_current(current: f, voltage: f, inductance: f, resistance: f, time_step: f) -> f:
     """ 
     Computes the current using 2nd oder ralston's method however assumes the current changes 
-    between frames but the induced voltage term does not.
+    between frames but the induced voltage term does not (semi-implicit integration)
     """
     k1 = voltage / inductance
     
