@@ -37,7 +37,9 @@ def computes_inductor_voltage(
     return supply_voltage - voltage_drop + induced_voltage
 
 
-def compute_current(current: f, voltage: f, inductance: f, resistance: f, time_step: f) -> f:
+def compute_current(
+    current: f, voltage: f, inductance: f, resistance: f, time_step: f
+) -> tuple[f, f]:
     """ 
     Computes the current using 2nd oder ralston's method however assumes the current changes 
     between frames but the induced voltage term does not (semi-implicit integration)
@@ -48,8 +50,9 @@ def compute_current(current: f, voltage: f, inductance: f, resistance: f, time_s
     voltage = voltage - resistance * 3 / 4 * k1 * time_step
     k2 = voltage / inductance
     
-    current += (1/3 * k1 + 2/3 * k2) * time_step
-    return current
+    di_dt = (1/3 * k1 + 2/3 * k2)
+    current += di_dt * time_step
+    return current, di_dt
 
 
 def computes_occupancy(
