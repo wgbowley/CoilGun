@@ -41,6 +41,7 @@ class CoilData:
     turns: f
     inductance: f
     resistance: f
+    b_field: f
     
     @property
     def name(self) -> str:
@@ -53,6 +54,7 @@ class CoilData:
             f", I:{self.current:.5f}A"
             f", L:{self.inductance:.5f}H"
             f", R:{self.resistance:.5f}Ω)>"
+            f", B:{self.b_field:.5f}T"
         )
         
     def __repr__(self) -> str: return self.name

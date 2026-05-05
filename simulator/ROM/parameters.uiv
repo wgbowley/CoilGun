@@ -17,6 +17,7 @@ stage_gap: 10 m(m)
 voltage: 18 (V)
 battery_esr: 250 m(Ω)
 atmospheric_density: 1.225 (kg/m^3)
+relative_permeability: 1.0
 
 
 [projectile]
@@ -48,6 +49,7 @@ magnetic_hysteresis: [
   [2.523750, 290439.000000],
   [2.560000, 318310.000000]
 ] (T), (A_m)
+alpha: 1
 
 
 [coil]

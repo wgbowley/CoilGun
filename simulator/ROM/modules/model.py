@@ -44,26 +44,30 @@ class CoilGun:
         force_list = []
         velocity_list = []
         
-        while self.projectile.position < self.coils[-1].position + self.proj_len:
+        while self.projectile.position < 1.5*self.coils[-1].position:
             # Updates coil supply state based on projectile position along the z-axis
             self._electrical_domain()
             
             # Magnetic & Mechanical domains
             force = self._compute_proj_force(self.derivative_epsilon)
             force += compute_proj_drag(
-                self.projectile.velocity, self.atmospheric_density, self.proj_coe_drag, self.proj_rad
+                self.projectile.velocity, 
+                self.atmospheric_density, 
+                self.proj_coe_drag, 
+                self.proj_rad
             )
             
             # Uses euler integration for velocity and position
-            self.projectile.velocity += (force/self.projectile.mass) * self.time_step
+            acceleration = force / self.projectile.mass
+            self.projectile.velocity += acceleration * self.time_step
+            self.projectile.position += self.projectile.velocity * self.time_step
+            time += self.time_step
             
             time_list.append(time)
             position_list.append(self.projectile.position)
             velocity_list.append(self.projectile.velocity)
             force_list.append(force)
-            
-            self.projectile.position += self.projectile.velocity * self.time_step
-            time += self.time_step
+            # print(self.projectile.position)
             
         return time_list, position_list, velocity_list, force_list
             
@@ -78,19 +82,10 @@ class CoilGun:
             if proj_pos >= coil_activation_pos and proj_pos < coil_disconnection_pos:
                 coil.supply_voltage = self.supply_voltage
             else:
-                coil.supply_voltage = 0.0
+                # TEMP. TESTING -> REMOVE LATER
+                coil.supply_voltage = -self.supply_voltage if coil.current > 0 else 0.0
             
-            # Calculates inductor voltage & current for the electromagnetic & mechanical domain
-            coil.inductor_voltage = computes_inductor_voltage(
-                coil.supply_voltage, coil.current, coil.resistance, coil.induced_voltage
-            )
-            
-            series_res = self.battery_esr + coil.resistance
-            coil.current, di_dt = compute_current(
-                coil.current, coil.inductor_voltage, coil.inductance, series_res, self.time_step
-            )
-            
-            # Calculates the occupancy & permeability
+            # # Calculates the occupancy & permeability
             occupancy = computes_occupancy(
                 self.projectile.position, coil.position, self.coil_outer_rad,
                 self.coil_len, self.proj_rad, self.proj_len
@@ -103,16 +98,17 @@ class CoilGun:
             permeability = compute_z_permeability(occupancy, h_z, b_z)
             inductance = compute_inductance(coil.turns, self.coil_len, self.coil_mean_rad, permeability)
 
-            # Calculates the induced voltage (transformer EMF + Motional EMF)
-            distance_traveled = self.projectile.velocity * self.time_step
-
-            if distance_traveled > 0:
-                dl_dz = (inductance - coil.inductance) / distance_traveled
-            else:
-                dl_dz = 0.0
-
-            coil.induced_voltage = coil.current * self.projectile.velocity * dl_dz
             coil.inductance = inductance
+
+            # Calculates inductor voltage & current for the electromagnetic & mechanical domain
+            coil.inductor_voltage = computes_inductor_voltage(
+                coil.supply_voltage, coil.current, coil.resistance, coil.induced_voltage
+            )
+            
+            series_res = self.battery_esr + coil.resistance
+            coil.current, _ = compute_current(
+                coil.current, coil.inductor_voltage, coil.inductance, series_res, self.time_step
+            )
 
     def _compute_proj_force(self, dz: f) -> f:
         """ 
@@ -143,7 +139,7 @@ class CoilGun:
 
             # Calculates field density & energy
             b_z = self._lookup_density(h_z)
-            energy += 0.5 * b_z * h_z * dz
+            energy += 0.5 * h_z * b_z * dz
 
             proj_pos += dz
             
@@ -154,9 +150,14 @@ class CoilGun:
         """ 
         Calculates the field strength across the z-axis including all coils within the domain 
         """
-        h_z = 0.0
-        for coil in self.coils:
-            h_z += compute_z_field_strength(
+        h_z_global = 0.0
+        for coil in self.coils:  
+            occupancy = computes_occupancy(
+                self.projectile.position, coil.position, self.coil_outer_rad,
+                self.coil_len, self.proj_rad, self.proj_len
+            )
+            
+            h_z = compute_z_field_strength(
                 z_pos, 
                 coil.position, 
                 coil.current, 
@@ -164,8 +165,10 @@ class CoilGun:
                 self.coil_len, 
                 self.coil_inner_rad
             )
+            
+            h_z_global += h_z * (1 + self.proj_alpha * occupancy)
 
-        return h_z
+        return h_z_global
     
     def _lookup_density(self, field_strength: f) -> f:
         """ 
@@ -222,7 +225,8 @@ class CoilGun:
                 inductance = compute_inductance(turns, self.coil_len, mean_radius, self.free_space),
                 resistance = compute_resistance(
                     turns, mean_radius, self.coil_wire_dia, self.coil_resistivity
-                )
+                ),
+                b_field=0.0
             )
             self.coils.append(coil)
 
@@ -240,6 +244,7 @@ class CoilGun:
         self.proj_len = q_strip(parameters.projectile.axial_length, LENGTH)
         self.proj_coe_drag = q_strip(parameters.projectile.coefficient_drag, NULLSET)
         self.proj_density = q_strip(parameters.projectile.density, MASS/LENGTH **3)
+        self.proj_alpha = q_strip(parameters.projectile.alpha, NULLSET)
         
         # Strips magnetic hysteresis table (b, h)co
         hysteresis = parameters.projectile.magnetic_hysteresis
@@ -264,7 +269,7 @@ class CoilGun:
         self.proj_bh_length = len(self.proj_h)
 
         self.coil_len = q_strip(parameters.coil.axial_length, LENGTH)
-        self.coil_activation = self.coil_len * 0.5
+        self.coil_activation = self.coil_len * 0.1
 
         self.coil_outer_rad = q_strip(parameters.coil.outer_radius, LENGTH)
         self.coil_inner_rad = q_strip(parameters.coil.inner_radius, LENGTH)
