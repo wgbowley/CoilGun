@@ -6,8 +6,11 @@ Description:
     runs the simulation and does complex multi-step equations.
 """
 
+import os
+import matplotlib.pyplot as plt
+
 from builtins import float as f
-from math import pi, ceil, log
+from math import pi, ceil, log, isclose
 
 from picounits import strip_quantity as q_strip, Q
 from picounits.extensions.loader import DynamicLoader
@@ -34,21 +37,29 @@ class CoilGun:
         self.derivative_epsilon = 1e-4
 
     def simulate(self) -> Q:
-        """ Simulates the coilgun and returns results as a dataclass stored as typed-quantities """
-        # Simulation Configuration & Loops variables
+        """ Simulates the coilgun and saves H-field snapshots to disk """
         self.generate_projectile_and_coils()
-        time = 0.0
         
-        time_list = []
-        position_list = []
-        force_list = []
-        velocity_list = []
-        
-        while self.projectile.position < 1.5*self.coils[-1].position:
-            # Updates coil supply state based on projectile position along the z-axis
-            self._electrical_domain()
+        # Create a directory for the frames if it doesn't exist
+        if not os.path.exists('sim_frames'):
+            os.makedirs('sim_frames')
             
-            # Magnetic & Mechanical domains
+        time = 0.0
+        step_count = 0
+        time_list, position_list, velocity_list, force_list = [], [], [], []
+
+        # Define spatial domain for plotting
+        z_max = 1.5 * self.coils[-1].position
+        z_axis = [i * 0.001 for i in range(int(z_max / 0.001))]
+
+        while self.projectile.position < z_max:
+            self._electrical_domain()
+            print(time)
+            # Save a photo every 10 steps
+            if step_count % 10 == 0:
+                h_profile = [self._compute_z_field_strength(z) for z in z_axis]
+                self._save_h_frame(z_axis, h_profile, time, step_count)
+            
             force = self._compute_proj_force(self.derivative_epsilon)
             force += compute_proj_drag(
                 self.projectile.velocity, 
@@ -57,20 +68,47 @@ class CoilGun:
                 self.proj_rad
             )
             
-            # Uses euler integration for velocity and position
+            # Euler Integration
             acceleration = force / self.projectile.mass
             self.projectile.velocity += acceleration * self.time_step
             self.projectile.position += self.projectile.velocity * self.time_step
-            time += self.time_step
             
+            # Data Logging
             time_list.append(time)
             position_list.append(self.projectile.position)
             velocity_list.append(self.projectile.velocity)
             force_list.append(force)
-            # print(self.projectile.position)
+            
+            time += self.time_step
+            step_count += 1
             
         return time_list, position_list, velocity_list, force_list
-            
+
+    def _save_h_frame(self, z_axis: list[f], h_vals: list[f], current_time: f, step: int):
+        """ Saves a static PNG of the current H-field state """
+        plt.figure(figsize=(12, 6))
+        
+        # Plotting the field
+        plt.plot(z_axis, h_vals, color='black', linewidth=1.5, label='Total H-Field')
+        
+        # Visualizing the Projectile (Blue) and Coils (Red outlines)
+        plt.axvspan(self.projectile.position - self.proj_len, 
+                    self.projectile.position, color='blue', alpha=0.3, label='Projectile')
+        
+        for coil in self.coils:
+            plt.axvline(x=coil.position - self.coil_len, color='red', linestyle=':', alpha=0.4)
+            plt.axvline(x=coil.position, color='red', linestyle=':', alpha=0.4)
+
+        plt.title(f"H-Field Profile | Time: {current_time:.6f}s | Step: {step}")
+        plt.xlabel("Z-Position (m)")
+        plt.ylabel("H-Field (A/m)")
+        plt.grid(True, alpha=0.3)
+        plt.legend(loc='upper right')
+        
+        # Save with leading zeros so the files sort correctly in your viewer
+        plt.savefig(f'sim_frames/frame_{step:05d}.png')
+        plt.close() # Important to close to free up memory
+
     def _electrical_domain(self) -> None:
         """ Managements the connection of the supply source to the coil """
         proj_pos = self.projectile.position
@@ -98,6 +136,13 @@ class CoilGun:
             permeability = compute_z_permeability(occupancy, h_z, b_z)
             inductance = compute_inductance(coil.turns, self.coil_len, self.coil_mean_rad, permeability)
 
+            # Calculates the induced voltage due to the change in the projectile position
+            dz_dt = self.projectile.velocity
+            dl_dz = 0.0
+
+            if dz_dt != 0.0: dl_dz = (inductance - coil.inductance) / (dz_dt * self.time_step)
+
+            coil.induced_voltage = coil.current * dz_dt * dl_dz
             coil.inductance = inductance
 
             # Calculates inductor voltage & current for the electromagnetic & mechanical domain
@@ -150,25 +195,34 @@ class CoilGun:
         """ 
         Calculates the field strength across the z-axis including all coils within the domain 
         """
+        proj_c = self.projectile.position - self.proj_len / 2
+        a = 0.8
+        r = 1
+
+        # Distance from projectile center
+        trans = proj_c - z_pos
+        r_sq = r ** 2
+        dist_sq = r_sq + trans ** 2
+        
+        # transform
+        d_z = a * trans / dist_sq
+        jacobian = 1 + a * ((trans**2 - r_sq) / (dist_sq**2))
+
         h_z_global = 0.0
-        for coil in self.coils:  
-            occupancy = computes_occupancy(
-                self.projectile.position, coil.position, self.coil_outer_rad,
-                self.coil_len, self.proj_rad, self.proj_len
-            )
-            
+        z_warped = z_pos - d_z
+        for coil in self.coils: 
             h_z = compute_z_field_strength(
-                z_pos, 
+                z_warped, 
                 coil.position, 
                 coil.current, 
                 coil.turns, 
                 self.coil_len, 
                 self.coil_inner_rad
             )
-            
-            h_z_global += h_z * (1 + self.proj_alpha * occupancy)
 
-        return h_z_global
+            h_z_global += h_z
+
+        return h_z_global * abs(jacobian)
     
     def _lookup_density(self, field_strength: f) -> f:
         """ 
@@ -269,7 +323,7 @@ class CoilGun:
         self.proj_bh_length = len(self.proj_h)
 
         self.coil_len = q_strip(parameters.coil.axial_length, LENGTH)
-        self.coil_activation = self.coil_len * 0.1
+        self.coil_activation = self.coil_len * 0.5
 
         self.coil_outer_rad = q_strip(parameters.coil.outer_radius, LENGTH)
         self.coil_inner_rad = q_strip(parameters.coil.inner_radius, LENGTH)
