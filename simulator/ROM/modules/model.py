@@ -55,6 +55,7 @@ class CoilGun:
         while self.projectile.position < z_max:
             self._electrical_domain()
             print(time)
+
             # Save a photo every 10 steps
             if step_count % 10 == 0:
                 h_profile = [self._compute_z_field_strength(z) for z in z_axis]
@@ -120,30 +121,7 @@ class CoilGun:
             if proj_pos >= coil_activation_pos and proj_pos < coil_disconnection_pos:
                 coil.supply_voltage = self.supply_voltage
             else:
-                # TEMP. TESTING -> REMOVE LATER
-                coil.supply_voltage = -self.supply_voltage if coil.current > 0 else 0.0
-            
-            # # Calculates the occupancy & permeability
-            occupancy = computes_occupancy(
-                self.projectile.position, coil.position, self.coil_outer_rad,
-                self.coil_len, self.proj_rad, self.proj_len
-            )
-            
-            # Computes field strength and than looks up b field
-            h_z = self._compute_z_field_strength(coil.position - self.coil_len / 2)
-            b_z = self._lookup_density(h_z)
-            
-            permeability = compute_z_permeability(occupancy, h_z, b_z)
-            inductance = compute_inductance(coil.turns, self.coil_len, self.coil_mean_rad, permeability)
-
-            # Calculates the induced voltage due to the change in the projectile position
-            dz_dt = self.projectile.velocity
-            dl_dz = 0.0
-
-            if dz_dt != 0.0: dl_dz = (inductance - coil.inductance) / (dz_dt * self.time_step)
-
-            coil.induced_voltage = coil.current * dz_dt * dl_dz
-            coil.inductance = inductance
+                coil.supply_voltage = 0
 
             # Calculates inductor voltage & current for the electromagnetic & mechanical domain
             coil.inductor_voltage = computes_inductor_voltage(
@@ -195,21 +173,18 @@ class CoilGun:
         """ 
         Calculates the field strength across the z-axis including all coils within the domain 
         """
-        proj_c = self.projectile.position - self.proj_len / 2
-        a = 0.8
-        r = 1
-
-        # Distance from projectile center
-        trans = proj_c - z_pos
-        r_sq = r ** 2
-        dist_sq = r_sq + trans ** 2
+        center = self.projectile.position - self.proj_len / 2
+        offset = (center - z_pos)
         
-        # transform
-        d_z = a * trans / dist_sq
-        jacobian = 1 + a * ((trans**2 - r_sq) / (dist_sq**2))
+        # Warpage function & conservation of field strength
+        warpage = self.proj_alpha * offset / (self.proj_beta ** 2 + offset ** 2)
 
+        upper = offset ** 2 - self.proj_beta ** 2
+        lower = (self.proj_beta ** 2 + center ** 2) ** 2
+        conservation = abs(1 - self.proj_alpha * upper / lower)
+        
         h_z_global = 0.0
-        z_warped = z_pos - d_z
+        z_warped = z_pos - warpage
         for coil in self.coils: 
             h_z = compute_z_field_strength(
                 z_warped, 
@@ -219,10 +194,9 @@ class CoilGun:
                 self.coil_len, 
                 self.coil_inner_rad
             )
-
             h_z_global += h_z
 
-        return h_z_global * abs(jacobian)
+        return h_z_global * conservation
     
     def _lookup_density(self, field_strength: f) -> f:
         """ 
@@ -299,6 +273,7 @@ class CoilGun:
         self.proj_coe_drag = q_strip(parameters.projectile.coefficient_drag, NULLSET)
         self.proj_density = q_strip(parameters.projectile.density, MASS/LENGTH **3)
         self.proj_alpha = q_strip(parameters.projectile.alpha, NULLSET)
+        self.proj_beta = q_strip(parameters.projectile.beta, NULLSET)
         
         # Strips magnetic hysteresis table (b, h)co
         hysteresis = parameters.projectile.magnetic_hysteresis

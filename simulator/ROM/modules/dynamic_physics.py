@@ -24,6 +24,7 @@ def compute_proj_drag(velocity: f, density: f, coefficient: f, proj_radius: f) -
 def compute_inductance(turns: f, coil_len: f, mean_radius: f, permeability: f) -> f:
     """ Calculates the coils self-inductance independent of mutual inductance between coils """
     area = pi * mean_radius ** 2
+
     return (turns ** 2 * permeability * area) / coil_len
 
 
@@ -91,9 +92,12 @@ def compute_z_permeability(occupied: f, field_strength: f, field_density: f) -> 
     """
     mu_core = field_density / field_strength  if field_strength != 0 else 0.0
     mu_air = 4 * pi * 10 ** -7
+    
+    permeability = occupied * mu_core + (1-occupied) * mu_air
+    if permeability < mu_air:
+        return mu_air
 
-    return occupied * mu_core + (1-occupied) * mu_air
-
+    return permeability
 
 def compute_z_field_strength(
     z_pos: f, z_coil: f, current: f, turns: f, coil_len: f, coil_rad: f

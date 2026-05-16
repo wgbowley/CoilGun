@@ -49,7 +49,10 @@ magnetic_hysteresis: [
   [2.523750, 290439.000000],
   [2.560000, 318310.000000]
 ] (T), (A_m)
+
+# Field warping parameters
 alpha: 1
+beta: 0.6
 
 
 [coil]
